@@ -27,9 +27,11 @@ from .selection import Cutoff, select_forecasts
 
 app = FastAPI(title="UK Wind Forecast API", version="1.0.0")
 
+# CORS_ORIGINS lists the deployed frontend URL(s); any localhost port is always allowed for local dev.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000").split(","),
+    allow_origins=[o for o in os.environ.get("CORS_ORIGINS", "").split(",") if o],
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_methods=["GET"],
     allow_headers=["*"],
 )
