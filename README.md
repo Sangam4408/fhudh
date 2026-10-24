@@ -17,6 +17,26 @@ backend/    FastAPI + pandas (coming next)
 scripts/    one-off Elexon data fetch (coming next)
 ```
 
+## Data
+
+January 2026 is fixed, so the data is downloaded once from [Elexon BMRS](https://bmrs.elexon.co.uk/) and committed as Parquet in `backend/data/`. The app never calls Elexon at runtime.
+
+| File | Source | Content |
+| --- | --- | --- |
+| `fuelhh_wind.parquet` | FUELHH, `fuelType = WIND` | Actual wind generation, half-hourly (1,488 rows) |
+| `windfor.parquet` | WINDFOR | Wind forecasts, hourly, every publication (18,080 rows from 264 runs) |
+
+To re-download (Python 3.12):
+
+```bash
+cd backend
+python -m venv .venv
+.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+cd ..
+python scripts/fetch_data.py    # prints a coverage report
+```
+
 ## Run the frontend (mock data for now)
 
 ```bash
