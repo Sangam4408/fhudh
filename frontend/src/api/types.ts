@@ -24,9 +24,13 @@ export interface ForecastPoint {
 }
 
 export interface ForecastResponse {
+  /** Every half-hour slot. WINDFOR is hourly, so :30 slots have no forecast. */
   points: ForecastPoint[]
+  /** Hours (on the hour) with no forecast published before the cutoff. */
   missingForecast: number
   missingActual: number
+  /** Slots with both an actual and a forecast. */
+  pairs: number
 }
 
 export interface Metrics {

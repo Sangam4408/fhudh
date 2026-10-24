@@ -1,6 +1,7 @@
 // Synthetic data that follows the API contract, so the frontend can be built
 // before the backend exists. Numbers are plausible, not real Elexon data.
-// Mock assumption: WINDFOR publishes on the hour, each run covering 48 h ahead.
+// Like the real WINDFOR, forecasts are hourly (none for :30 slots). Mock
+// assumption: a run is published every hour, covering 48 h ahead.
 
 import type {
   BreakdownBy,
@@ -58,7 +59,8 @@ function buildPoints(f: Filters): ForecastPoint[] {
     const cutoff = cutoffFor(t, f)
     const publish = Math.ceil(cutoff / HOUR_MS) * HOUR_MS - HOUR_MS
     const horizonH = (t - publish) / HOUR_MS
-    const missingForecast = horizonH > MAX_HORIZON_H || hash01(idx, 11) < 0.005
+    const offHour = new Date(t).getUTCMinutes() !== 0
+    const missingForecast = offHour || horizonH > MAX_HORIZON_H || hash01(idx, 11) < 0.005
 
     const actual = actualAt(t)
     const sigma = 250 + 28 * horizonH
@@ -137,8 +139,9 @@ export const mockApi = {
     const points = buildPoints(f)
     return delay({
       points,
-      missingForecast: points.filter((p) => p.forecast == null).length,
+      missingForecast: points.filter((p) => p.forecast == null && p.startTime.slice(14, 16) === '00').length,
       missingActual: points.filter((p) => p.actual == null).length,
+      pairs: complete(points).length,
     })
   },
 

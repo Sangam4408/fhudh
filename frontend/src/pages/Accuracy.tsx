@@ -62,7 +62,7 @@ export default function Accuracy() {
         {m ? (
           <>
             With 90% confidence, actual wind will be within <b className="num">±{formatMw(m.p90Abs)}</b> of the forecast.
-            <span className="muted"> Based on {m.n.toLocaleString('en-GB')} half-hours.</span>
+            <span className="muted"> Based on {m.n.toLocaleString('en-GB')} hours.</span>
           </>
         ) : (
           'Loading…'
@@ -78,7 +78,7 @@ export default function Accuracy() {
           hint={m ? (m.bias >= 0 ? 'Over-forecasts' : 'Under-forecasts') : undefined}
         />
         <KpiCard label="MAE % of mean" value={m ? `${m.maePctMean.toFixed(1)}%` : '…'} hint={m ? `Mean output ${formatMw(m.meanActual)}` : undefined} />
-        <KpiCard label="MAE % of capacity" value={m ? `${m.maePctCapacity.toFixed(1)}%` : '…'} hint={m ? `Capacity ${formatMw(m.capacity)}` : undefined} />
+        <KpiCard label="MAE % of capacity" value={m ? `${m.maePctCapacity.toFixed(1)}%` : '…'} hint={m ? `Peak observed ${formatMw(m.capacity)}` : undefined} />
       </div>
 
       <Panel
@@ -104,14 +104,14 @@ export default function Accuracy() {
       </Panel>
 
       <div className="grid-2">
-        <Panel title="Error by time of day" subtitle="MAE (bars) and bias (line) per half-hour, UK time">
+        <Panel title="Error by time of day" subtitle="MAE (bars) and bias (line) per hour, UK time">
           {byHour.isPending ? (
             <Loading height={260} />
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <ComposedChart data={byHour.data?.rows} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
                 <CartesianGrid stroke="var(--grid)" vertical={false} />
-                <XAxis dataKey="key" {...axis} interval={7} />
+                <XAxis dataKey="key" {...axis} interval={3} />
                 <YAxis {...axis} />
                 <Tooltip formatter={mwTip} />
                 <Legend wrapperStyle={{ fontSize: 13 }} />

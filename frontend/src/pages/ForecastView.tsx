@@ -85,11 +85,15 @@ export default function ForecastView() {
   return (
     <div className="stack">
       <div className="kpis">
-        <KpiCard label="Half-hour slots" value={d ? d.points.length.toLocaleString('en-GB') : '…'} hint={`${f.start} to ${f.end}`} />
         <KpiCard
-          label="Missing slots"
+          label="Hours compared"
+          value={d ? d.pairs.toLocaleString('en-GB') : '…'}
+          hint={d ? `${d.points.length.toLocaleString('en-GB')} half-hour actuals · hourly forecasts` : undefined}
+        />
+        <KpiCard
+          label="Missing"
           value={d ? (d.missingForecast + d.missingActual).toLocaleString('en-GB') : '…'}
-          hint={d ? `${d.missingForecast} no forecast · ${d.missingActual} no actual` : undefined}
+          hint={d ? `${d.missingForecast} hours no forecast · ${d.missingActual} slots no actual` : undefined}
         />
         <KpiCard label="Mean absolute error" value={m ? formatMw(m.mae) : '…'} hint={m ? `${m.maePctMean.toFixed(1)}% of mean output` : undefined} />
         <KpiCard
@@ -145,7 +149,8 @@ export default function ForecastView() {
                 stroke="var(--c-forecast)"
                 strokeWidth={2}
                 strokeDasharray="5 3"
-                dot={false}
+                dot={singleDay ? { r: 2.5, fill: 'var(--c-forecast)' } : false}
+                connectNulls
                 isAnimationActive={false}
               />
             </LineChart>

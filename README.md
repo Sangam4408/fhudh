@@ -37,10 +37,25 @@ cd ..
 python scripts/fetch_data.py    # prints a coverage report
 ```
 
-## Run the frontend (mock data for now)
+## Run locally
+
+Backend (terminal 1):
+
+```bash
+cd backend
+.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000    # API docs: http://localhost:8000/docs
+pytest                                       # run the tests
+```
+
+Frontend (terminal 2):
 
 ```bash
 cd frontend
 npm install
-npm run dev        # http://localhost:5173
+copy .env.example .env          # macOS/Linux: cp .env.example .env
+npm run dev                     # http://localhost:5173
 ```
+
+Without `frontend/.env` the frontend runs on built-in mock data and shows a "Mock data" badge.
