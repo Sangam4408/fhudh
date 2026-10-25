@@ -23,6 +23,7 @@ export function FilterBar() {
         <legend>Delivery days</legend>
         <div className="row">
           <select
+            className="preset"
             aria-label="Date preset"
             value={presetFor(f)}
             onChange={(e) => {
@@ -37,35 +38,39 @@ export function FilterBar() {
               Custom
             </option>
           </select>
-          <input
-            type="date"
-            aria-label="Start day"
-            min={WINDOW_START}
-            max={WINDOW_END}
-            value={f.start}
-            onChange={(e) => e.target.value && update({ start: e.target.value, end: f.end < e.target.value ? e.target.value : f.end })}
-          />
-          <span className="muted">to</span>
-          <input
-            type="date"
-            aria-label="End day"
-            min={f.start}
-            max={WINDOW_END}
-            value={f.end}
-            onChange={(e) => e.target.value && update({ end: e.target.value })}
-          />
-          <button type="button" className="ghost" onClick={() => update({ start: f.start, end: f.start })}>
-            Single day
-          </button>
-          <button
-            type="button"
-            className="ghost"
-            aria-label="Next day"
-            disabled={f.end >= WINDOW_END}
-            onClick={() => update({ start: addDays(f.start, 1), end: addDays(f.end, 1) })}
-          >
-            →
-          </button>
+          <div className="dates">
+            <input
+              type="date"
+              aria-label="Start day"
+              min={WINDOW_START}
+              max={WINDOW_END}
+              value={f.start}
+              onChange={(e) => e.target.value && update({ start: e.target.value, end: f.end < e.target.value ? e.target.value : f.end })}
+            />
+            <span className="muted">to</span>
+            <input
+              type="date"
+              aria-label="End day"
+              min={f.start}
+              max={WINDOW_END}
+              value={f.end}
+              onChange={(e) => e.target.value && update({ end: e.target.value })}
+            />
+          </div>
+          <div className="day-nav">
+            <button type="button" className="ghost" onClick={() => update({ start: f.start, end: f.start })}>
+              Single day
+            </button>
+            <button
+              type="button"
+              className="ghost"
+              aria-label="Next day"
+              disabled={f.end >= WINDOW_END}
+              onClick={() => update({ start: addDays(f.start, 1), end: addDays(f.end, 1) })}
+            >
+              →
+            </button>
+          </div>
         </div>
       </fieldset>
 

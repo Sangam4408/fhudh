@@ -16,6 +16,8 @@ import type { ForecastPoint } from '../api/types'
 import { Empty, ErrorBanner, KpiCard, Loading, Panel } from '../components/common'
 import { useForecast, useMetrics } from '../hooks/useApi'
 import { useFilters } from '../hooks/useFilters'
+import { useIsMobile } from '../hooks/useMediaQuery'
+import { axisLabel, axisProps, chartMargin, legendStyle, yAxisWidth } from '../lib/chart'
 import { formatMw, formatSlot } from '../lib/time'
 
 interface Row extends ForecastPoint {
@@ -66,6 +68,8 @@ export default function ForecastView() {
   const forecast = useForecast(f)
   const metrics = useMetrics(f)
   const singleDay = f.start === f.end
+  const mobile = useIsMobile()
+  const axis = axisProps(mobile)
 
   const rows: Row[] = useMemo(
     () =>
@@ -117,12 +121,12 @@ export default function ForecastView() {
         }
       >
         {forecast.isPending ? (
-          <Loading height={380} />
+          <Loading height={mobile ? 280 : 380} />
         ) : rows.length === 0 ? (
           <Empty />
         ) : (
-          <ResponsiveContainer width="100%" height={380}>
-            <LineChart data={rows} margin={{ top: 8, right: 16, bottom: 0, left: 8 }}>
+          <ResponsiveContainer width="100%" height={mobile ? 280 : 380}>
+            <LineChart data={rows} margin={chartMargin(mobile)}>
               <CartesianGrid stroke="var(--grid)" vertical={false} />
               <XAxis
                 dataKey="t"
@@ -130,18 +134,12 @@ export default function ForecastView() {
                 scale="time"
                 domain={['dataMin', 'dataMax']}
                 tickFormatter={(t: number) => axisTick(t, singleDay)}
-                stroke="var(--axis)"
-                tick={{ fill: 'var(--text-2)', fontSize: 12 }}
-                minTickGap={40}
+                {...axis}
+                minTickGap={mobile ? 24 : 40}
               />
-              <YAxis
-                tickFormatter={kmw}
-                stroke="var(--axis)"
-                tick={{ fill: 'var(--text-2)', fontSize: 12 }}
-                label={{ value: 'MW', angle: -90, position: 'insideLeft', fill: 'var(--text-2)', fontSize: 12 }}
-              />
+              <YAxis tickFormatter={kmw} {...axis} width={yAxisWidth(mobile)} label={axisLabel('MW', mobile)} />
               <Tooltip content={<SlotTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 13 }} />
+              <Legend wrapperStyle={legendStyle(mobile)} />
               <Line name="Actual" dataKey="actual" stroke="var(--c-actual)" strokeWidth={2} dot={false} isAnimationActive={false} />
               <Line
                 name="Forecast at cutoff"
@@ -160,13 +158,13 @@ export default function ForecastView() {
 
       <Panel title="Forecast error over time" subtitle="Forecast − actual. Above zero: forecast too high, so too little power was bought.">
         {forecast.isPending ? (
-          <Loading height={200} />
+          <Loading height={mobile ? 160 : 200} />
         ) : (
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={rows} margin={{ top: 8, right: 16, bottom: 0, left: 8 }} barCategoryGap={0}>
+          <ResponsiveContainer width="100%" height={mobile ? 160 : 200}>
+            <BarChart data={rows} margin={chartMargin(mobile)} barCategoryGap={0}>
               <CartesianGrid stroke="var(--grid)" vertical={false} />
-              <XAxis dataKey="t" tickFormatter={(t: number) => axisTick(t, singleDay)} stroke="var(--axis)" tick={{ fill: 'var(--text-2)', fontSize: 12 }} minTickGap={40} />
-              <YAxis tickFormatter={kmw} stroke="var(--axis)" tick={{ fill: 'var(--text-2)', fontSize: 12 }} />
+              <XAxis dataKey="t" tickFormatter={(t: number) => axisTick(t, singleDay)} {...axis} minTickGap={mobile ? 24 : 40} />
+              <YAxis tickFormatter={kmw} {...axis} width={yAxisWidth(mobile)} />
               <Tooltip content={<SlotTooltip />} />
               <ReferenceLine y={0} stroke="var(--axis)" />
               <Bar dataKey="error" fill="var(--c-error)" isAnimationActive={false} />

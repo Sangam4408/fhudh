@@ -16,10 +16,11 @@ import {
 import { Empty, ErrorBanner, KpiCard, Loading, Panel } from '../components/common'
 import { useBreakdown, useConclusion, useErrors, useMetrics } from '../hooks/useApi'
 import { useFilters } from '../hooks/useFilters'
+import { useIsMobile } from '../hooks/useMediaQuery'
+import { axisLabel, axisProps, chartMargin, legendStyle, yAxisWidth } from '../lib/chart'
 import { formatDay, formatMw } from '../lib/time'
 
 const BIN_MW = 250
-const axis = { stroke: 'var(--axis)', tick: { fill: 'var(--text-2)', fontSize: 12 } }
 const mwTip = (v: unknown) => formatMw(Number(v))
 
 function histogram(errors: number[]) {
@@ -44,6 +45,10 @@ export default function Accuracy() {
   const byHorizon = useBreakdown(f, 'horizon')
   const byDay = useBreakdown(f, 'day')
   const conclusion = useConclusion(f)
+  const mobile = useIsMobile()
+  const axis = axisProps(mobile)
+  const yWidth = yAxisWidth(mobile)
+  const breakdownHeight = mobile ? 220 : 260
 
   const bins = useMemo(() => histogram(errors.data?.errors ?? []), [errors.data])
   const worstDays = useMemo(
@@ -86,13 +91,13 @@ export default function Accuracy() {
         subtitle={m ? `Forecast − actual, ${BIN_MW} MW bins. P10 ${formatMw(m.p10)} · P50 ${formatMw(m.p50)} · P90 ${formatMw(m.p90)}` : undefined}
       >
         {errors.isPending || !m ? (
-          <Loading />
+          <Loading height={mobile ? 240 : 320} />
         ) : (
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={bins} margin={{ top: 24, right: 16, bottom: 0, left: 8 }} barCategoryGap={1}>
+          <ResponsiveContainer width="100%" height={mobile ? 240 : 320}>
+            <BarChart data={bins} margin={chartMargin(mobile, 24)} barCategoryGap={1}>
               <CartesianGrid stroke="var(--grid)" vertical={false} />
               <XAxis dataKey="mid" {...axis} tickFormatter={(v: number) => `${(v / 1000).toFixed(1)}k`} minTickGap={24} />
-              <YAxis {...axis} allowDecimals={false} label={{ value: 'slots', angle: -90, position: 'insideLeft', fill: 'var(--text-2)', fontSize: 12 }} />
+              <YAxis {...axis} width={yWidth} allowDecimals={false} label={axisLabel('slots', mobile)} />
               <Tooltip formatter={(v) => [v, 'slots']} labelFormatter={(v) => `${formatMw(Number(v) - BIN_MW / 2)} to ${formatMw(Number(v) + BIN_MW / 2)}`} />
               <Bar dataKey="count" fill="var(--c-forecast)" isAnimationActive={false} />
               <ReferenceLine x={nearestMid(m.p10)} stroke="var(--text-1)" strokeDasharray="4 3" label={{ value: 'P10', position: 'top', fill: 'var(--text-1)', fontSize: 12 }} />
@@ -106,15 +111,15 @@ export default function Accuracy() {
       <div className="grid-2">
         <Panel title="Error by time of day" subtitle="MAE (bars) and bias (line) per hour, UK time">
           {byHour.isPending ? (
-            <Loading height={260} />
+            <Loading height={breakdownHeight} />
           ) : (
-            <ResponsiveContainer width="100%" height={260}>
-              <ComposedChart data={byHour.data?.rows} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
+            <ResponsiveContainer width="100%" height={breakdownHeight}>
+              <ComposedChart data={byHour.data?.rows} margin={chartMargin(mobile)}>
                 <CartesianGrid stroke="var(--grid)" vertical={false} />
-                <XAxis dataKey="key" {...axis} interval={3} />
-                <YAxis {...axis} />
+                <XAxis dataKey="key" {...axis} interval={mobile ? 5 : 3} />
+                <YAxis {...axis} width={yWidth} />
                 <Tooltip formatter={mwTip} />
-                <Legend wrapperStyle={{ fontSize: 13 }} />
+                <Legend wrapperStyle={legendStyle(mobile)} />
                 <ReferenceLine y={0} stroke="var(--axis)" />
                 <Bar name="MAE" dataKey="mae" fill="var(--c-actual)" isAnimationActive={false} />
                 <Line name="Bias" dataKey="bias" stroke="var(--c-forecast)" strokeWidth={2} dot={false} isAnimationActive={false} />
@@ -125,15 +130,15 @@ export default function Accuracy() {
 
         <Panel title="Error by forecast horizon" subtitle="Hours between publishTime and the slot">
           {byHorizon.isPending ? (
-            <Loading height={260} />
+            <Loading height={breakdownHeight} />
           ) : (
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={byHorizon.data?.rows} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
+            <ResponsiveContainer width="100%" height={breakdownHeight}>
+              <BarChart data={byHorizon.data?.rows} margin={chartMargin(mobile)}>
                 <CartesianGrid stroke="var(--grid)" vertical={false} />
-                <XAxis dataKey="key" {...axis} />
-                <YAxis {...axis} />
+                <XAxis dataKey="key" {...axis} interval={0} />
+                <YAxis {...axis} width={yWidth} />
                 <Tooltip formatter={mwTip} />
-                <Legend wrapperStyle={{ fontSize: 13 }} />
+                <Legend wrapperStyle={legendStyle(mobile)} />
                 <Bar name="MAE" dataKey="mae" fill="var(--c-actual)" isAnimationActive={false} />
                 <Bar name="P90 |error|" dataKey="p90Abs" fill="var(--c-forecast)" isAnimationActive={false} />
               </BarChart>
@@ -144,13 +149,13 @@ export default function Accuracy() {
 
       <Panel title="Error by delivery day" subtitle="MAE per day; the three worst days are highlighted">
         {byDay.isPending ? (
-          <Loading height={260} />
+          <Loading height={breakdownHeight} />
         ) : (
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={byDay.data?.rows} margin={{ top: 8, right: 16, bottom: 0, left: 8 }}>
+          <ResponsiveContainer width="100%" height={breakdownHeight}>
+            <BarChart data={byDay.data?.rows} margin={chartMargin(mobile)}>
               <CartesianGrid stroke="var(--grid)" vertical={false} />
-              <XAxis dataKey="key" {...axis} tickFormatter={formatDay} minTickGap={16} />
-              <YAxis {...axis} />
+              <XAxis dataKey="key" {...axis} tickFormatter={formatDay} minTickGap={mobile ? 12 : 16} />
+              <YAxis {...axis} width={yWidth} />
               <Tooltip formatter={mwTip} labelFormatter={(v) => formatDay(String(v))} />
               <Bar name="MAE" dataKey="mae" isAnimationActive={false}>
                 {byDay.data?.rows.map((r) => (
