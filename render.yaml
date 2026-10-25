@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: uk-wind-api
+    runtime: docker
+    plan: free
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # Set to the Vercel frontend URL (no trailing slash) after the frontend is deployed.
+      - key: CORS_ORIGINS
+        sync: false

@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useLocation } from 'react-router'
 import { USING_MOCK } from '../api/client'
 import { FilterBar } from './FilterBar'
+import { WakeBanner } from './WakeBanner'
 
 export function Layout() {
   // Keep the query string when switching tabs so filters carry over.
@@ -26,6 +27,7 @@ export function Layout() {
         )}
       </header>
       <FilterBar />
+      <WakeBanner />
       <main>
         <Outlet />
       </main>

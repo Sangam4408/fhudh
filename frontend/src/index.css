@@ -129,3 +129,5 @@ button:disabled { opacity: 0.45; cursor: default; }
   .grid-2 { grid-template-columns: 1fr; }
   .tabs { margin-left: 0; }
 }
+
+.wake-banner { margin: 0 0 16px; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); }
