@@ -32,7 +32,10 @@ def slot(df: pd.DataFrame, start_time: str) -> pd.Series:
     return df.loc[df["startTime"] == ts(start_time)].iloc[0]
 
 
-def run(a: pd.DataFrame, f: pd.DataFrame, cutoff: Cutoff = Cutoff()) -> pd.DataFrame:
+DEFAULT_CUTOFF = Cutoff()
+
+
+def run(a: pd.DataFrame, f: pd.DataFrame, cutoff: Cutoff = DEFAULT_CUTOFF) -> pd.DataFrame:
     return select_forecasts(a, f, cutoff, DAY, DAY)
 
 

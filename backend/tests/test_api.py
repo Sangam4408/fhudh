@@ -34,7 +34,8 @@ def test_single_day():
 
 
 def test_later_decision_time_changes_forecast_source():
-    body = client.get("/api/forecast", params={"start": "2026-01-15", "end": "2026-01-15", "decision_time": "16:00"}).json()
+    params = {"start": "2026-01-15", "end": "2026-01-15", "decision_time": "16:00"}
+    body = client.get("/api/forecast", params=params).json()
     assert body["points"][0]["publishTime"].startswith("2026-01-14T15:30")
 
 

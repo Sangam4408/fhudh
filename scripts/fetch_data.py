@@ -14,7 +14,7 @@ from __future__ import annotations
 import argparse
 import sys
 import time
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import httpx
@@ -69,8 +69,8 @@ def fetch_actuals(client: httpx.Client, start: date, end: date) -> pd.DataFrame:
 
 def fetch_forecasts(client: httpx.Client, start: date, end: date) -> pd.DataFrame:
     rows: list[dict] = []
-    t = datetime.combine(start, datetime.min.time(), timezone.utc) - PUBLISH_LOOKBACK
-    stop = datetime.combine(end + timedelta(days=1), datetime.min.time(), timezone.utc)
+    t = datetime.combine(start, datetime.min.time(), UTC) - PUBLISH_LOOKBACK
+    stop = datetime.combine(end + timedelta(days=1), datetime.min.time(), UTC)
     while t < stop:
         to = min(t + CHUNK, stop)
         print(f"WINDFOR published {t:%Y-%m-%d %H:%M} .. {to:%Y-%m-%d %H:%M} UTC")

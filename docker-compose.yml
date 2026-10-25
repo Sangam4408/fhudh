@@ -1,0 +1,17 @@
+services:
+  api:
+    build: ./backend
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # The browser calls the API, so this is the host-mapped port, not the compose service name.
+        VITE_API_URL: http://localhost:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      api:
+        condition: service_healthy
