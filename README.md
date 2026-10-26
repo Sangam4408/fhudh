@@ -21,10 +21,10 @@ scripts/    one-off Elexon data fetch (coming next)
 
 January 2026 is fixed, so the data is downloaded once from [Elexon BMRS](https://bmrs.elexon.co.uk/) and committed as Parquet in `backend/data/`. The app never calls Elexon at runtime.
 
-| File | Source | Content |
-| --- | --- | --- |
-| `fuelhh_wind.parquet` | FUELHH, `fuelType = WIND` | Actual wind generation, half-hourly (1,488 rows) |
-| `windfor.parquet` | WINDFOR | Wind forecasts, hourly, every publication (18,080 rows from 264 runs) |
+| File                  | Source                    | Content                                                               |
+| --------------------- | ------------------------- | --------------------------------------------------------------------- |
+| `fuelhh_wind.parquet` | FUELHH, `fuelType = WIND` | Actual wind generation, half-hourly (1,488 rows)                      |
+| `windfor.parquet`     | WINDFOR                   | Wind forecasts, hourly, every publication (18,080 rows from 264 runs) |
 
 To re-download (Python 3.12):
 
@@ -59,3 +59,4 @@ npm run dev                     # http://localhost:5173
 ```
 
 Without `frontend/.env` the frontend runs on built-in mock data and shows a "Mock data" badge.
+## live https://fhudh.vercel.app/  
