@@ -19,6 +19,9 @@ BreakdownBy = Literal["hour", "horizon", "day"]
 HORIZON_BINS = [0, 18, 24, 30, 36, np.inf]
 HORIZON_LABELS = ["<18 h", "18–24 h", "24–30 h", "30–36 h", "36 h+"]
 
+# Share of hours erring the same way above which the conclusion calls out one-sided risk.
+LOPSIDED_PCT = 70
+
 
 def paired(df: pd.DataFrame) -> pd.DataFrame:
     """Slots with both an actual and a forecast, plus their signed error."""
@@ -115,7 +118,26 @@ def conclusion(df: pd.DataFrame, cutoff: Cutoff, capacity_mw: float) -> str:
         f"which means {effect}. "
         f"In 90% of hours the error was within ±{_mw(m['p90_abs'])}, so holding a buffer of about that size "
         f"covers 9 in 10 hours. "
+        f"{_one_sided(df, m)}"
         f"Errors were largest around {worst_hours} UK time and on {worst_days}; a bigger buffer is justified then."
+    )
+
+
+def _one_sided(df: pd.DataFrame, m: dict) -> str:
+    """Extra sentence when errors are lopsided, since the risk is then mostly on one side."""
+    e = paired(df)["error"]
+    over = m["bias"] >= 0
+    share = float(((e > 0) if over else (e < 0)).mean() * 100)
+    if share < LOPSIDED_PCT:
+        return ""
+    if over:
+        return (
+            f"The forecast was too high in {share:.0f}% of hours, so the real risk is a shortfall: in 90% of hours "
+            f"actual wind was no more than {_mw(m['p90'])} below forecast. "
+        )
+    return (
+        f"The forecast was too low in {share:.0f}% of hours, so the real risk is buying too much: in 90% of hours "
+        f"actual wind was no more than {_mw(-m['p10'])} above forecast. "
     )
 
 

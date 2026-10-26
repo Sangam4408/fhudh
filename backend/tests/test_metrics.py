@@ -87,3 +87,9 @@ def test_conclusion_states_buffer_and_direction():
     assert "09:00 D-1" in text
     assert "over-forecast" in text and "buying too little" in text
     assert "±" in text
+    assert "too high in 100% of hours" in text and "shortfall" in text
+
+
+def test_conclusion_skips_one_sided_note_when_errors_are_balanced():
+    text = metrics.conclusion(SAMPLE, Cutoff(), capacity_mw=10_000)
+    assert "shortfall" not in text and "buying too much:" not in text
