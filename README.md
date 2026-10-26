@@ -60,3 +60,4 @@ npm run dev                     # http://localhost:5173
 
 Without `frontend/.env` the frontend runs on built-in mock data and shows a "Mock data" badge.
 ## live https://fhudh.vercel.app/  
+##this project is build with the help of the claude 
