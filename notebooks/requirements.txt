@@ -1,0 +1,5 @@
+# Extra packages for notebooks/analysis.ipynb (the API image does not need them)
+-r ../backend/requirements.txt
+ipykernel==7.4.0
+nbconvert==7.17.2
+matplotlib==3.11.2
